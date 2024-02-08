@@ -1,41 +1,29 @@
 require([
   "esri/WebScene",
   "esri/views/SceneView",
-  "esri/Camera",
   "esri/widgets/Home",
   "esri/widgets/Legend",
-  "esri/widgets/Search", // Import the Search module
+  "esri/widgets/Search",
   "dojo/domReady!"
-], function(WebScene, SceneView, Camera, Home, Legend, Search) {
+], function(WebScene, SceneView, Home, Legend, Search) {
 
   var scene = new WebScene({
-    portalItem:{
-     id:"6092871122084a38936bfef10e118653" 
+    portalItem: {
+      id: "fb1274b466d443a682a2822bc0366591"
     }
   });
   
-  var camera = new Camera({
-    position: [
-     -90.20, // lon
-     38.65, // lat
-      8000000 // elevation in meters
-    ],
-    tilt:0,
-    heading: 0
-  });
-
   var view = new SceneView({
     container: "viewDiv",
     map: scene,
-    viewingMode:"global",
-    camera: camera,
+    viewingMode: "global",
     environment: {
-        lighting: {
-          date: new Date(),
-          directShadowsEnabled: true,
-          cameraTrackingEnabled: false
-        }
-    },
+      lighting: {
+        date: new Date(),
+        directShadowsEnabled: true,
+        cameraTrackingEnabled: false
+      }
+    }
   });
   
   var homeBtn = new Home({
@@ -43,20 +31,16 @@ require([
   });
   view.ui.add(homeBtn, "top-left");
   
+  // Assuming MO and FL are previously defined HTML buttons
   [MO, FL].forEach(function(button) {
     button.style.display = 'flex';
     view.ui.add(button, 'top-right');
   });
   
-  // Add the Search widget
   var searchWidget = new Search({
     view: view
   });
-  // Place it at the top right corner of the view
-  view.ui.add(searchWidget, {
-    position: "top-right",
-    index: 0 // Adjust the index as necessary to position it correctly
-  });
+  view.ui.add(searchWidget, "top-right");
   
   MO.addEventListener('click', function() {
     view.goTo({
@@ -70,7 +54,7 @@ require([
     });
   }); 
 
-   FL.addEventListener('click', function() {
+  FL.addEventListener('click', function() {
     view.goTo({
       position: {
         x: -81.51,
@@ -82,20 +66,15 @@ require([
     });
   });
 
-view.when(function() {
-   
-  var featureLayer = scene.layers.getItemAt(0);
+  view.when(function() {
+    // Add the Legend widget with automatic layer inclusion
+    var legend = new Legend({
+      view: view
+      // Omitting layerInfos will automatically include all layers
+    });
 
-        var legend = new Legend({
-          view: view,
-          layerInfos: [{
-            layer: featureLayer,
-            title: "Tornado"
-          }]
-        });
-
-        // Add widget to the bottom right corner of the view
-        view.ui.add(legend, "bottom-right");
-      });
+    // Add widget to the bottom right corner of the view
+    view.ui.add(legend, "bottom-right");
+  });
 
 });
